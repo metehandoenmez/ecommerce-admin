@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 
 
 const formSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1, {message: "Store name needs to be at least 1 character long"}),
 });
 
 export const StoreModal = () => {
