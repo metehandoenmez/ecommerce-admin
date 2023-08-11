@@ -3,6 +3,9 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import axios from 'axios'
+import {toast} from "react-hot-toast";
 
 import { useStoreModal } from "@/hooks/use-store-modal";
 import { Modal } from "@/components/ui/modal";
@@ -16,6 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 
+
+
+
 const formSchema = z.object({
   name: z.string().min(1, {message: "Store name needs to be at least 1 character long"}),
 });
@@ -23,6 +29,8 @@ const formSchema = z.object({
 export const StoreModal = () => {
 
   const storeModal = useStoreModal();
+
+  const [loading, setLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -32,8 +40,19 @@ export const StoreModal = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    //TODO: create store
+    try {
+      setLoading(true);
+
+      const response = await axios.post('/api/stores', values);
+
+
+      toast.success('Store created.')
+      
+    } catch(error) {
+      toast.error('Something went wrong')
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,7 +68,9 @@ export const StoreModal = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your New E-Commerce Store Name" {...field} />
+                    <Input placeholder="Your New E-Commerce Store Name"
+                    disabled={loading}
+                    {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -57,9 +78,10 @@ export const StoreModal = () => {
                 />
                 <div className="pt-6 space-x-2 flex items-center justify-end w-full">
                   <Button variant="outline"
+                  disabled={loading}
                   onClick={storeModal.onClose}
                   >Cancel</Button>
-                  <Button type="submit">Continue</Button>
+                  <Button disabled={loading} type="submit">Continue</Button>
                 </div>
               </form>
             </Form>
@@ -69,4 +91,4 @@ export const StoreModal = () => {
   );
 };
 
-//1.21.30
+//1.45.04
